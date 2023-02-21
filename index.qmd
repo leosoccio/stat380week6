@@ -1,11 +1,10 @@
 ---
 title: "Weekly Summary Template"
-author: "Author Name"
+author: "Leo Soccio"
 title-block-banner: true
 title-block-style: default
 toc: true
-format: html
-# format: pdf
+format: pdf
 ---
 
 ---
@@ -19,28 +18,106 @@ Include a _very brief_ summary of what you learnt in this class here.
 
 Today, I learnt the following concepts in class:
 
-1. Item 1
-1. Item 2
-1. Item 3
+1. Multicollinearity
+1. VIF
+1. Stepwise Regression
 :::
 
 Provide more concrete details here. You can also use footenotes[^footnote] if you like
 
-```{R results='hide'}
-#| output: false
+```{R}
+# package loading
+packages <- c("ISLR2","dplyr","tidyr","readr","purrr","glmnet","caret","car")
+renv::install(packages)
+install.packages("ISLR2")
 library(dplyr)
+library(tidyr)
+library(readr)
 library(purrr)
+library(glmnet)
+library(caret)
+library(car)
 ```
 
+### Multicollinearity
 
-For example: 
-in class we learnt we learnt about the `map` function from the `purrr` package. 
+Consider the Boston housing dataset:
 
-
-```{R results='hide', fig.width=7, fig.height=7}
-par(mfrow=c(3, 3), mar=c(3.5, 3.5, 2, 1), mgp=c(2.4, 0.8, 0))
-map(1:9, function(i)rnorm(1000) %>% hist(., main=i, col=i))
+```{R}
+library(ISLR2)
+attach(ISLR2::Boston)
+df <- Boston
 ```
+
+```{R}
+full_model <- lm(medv~.,df)
+summary(full_model)
+```
+
+Observe insignificant variables:
+```{R}
+plot(medv~age,df)
+abline(lm(medv~age,df))
+plot(medv~indus,df)
+abline(lm(medv~indus,df))
+```
+```{R}
+age_model <- lm(medv~age,df)
+summary(age_model)
+indus_model <- lm(medv~indus,df)
+summary(indus_model)
+```
+
+Both age and indus are significant in their individual models, so why are they not significant in the full model?
+
+```{R}
+library(corrplot)
+R <- df %>%
+  keep(is.numeric)%>%
+  cor()
+R
+corrplot(R, type="upper",order="hclust")
+```
+Age and indus are clearly related to multiple other variables.
+
+
+### Variance Inflation Factors (VIF)
+
+```{R}
+library(car)
+vif_model <- lm(medv~.,df)
+vif(vif_model)
+```
+VIF>2 means that there is high variance inflation and correlation with other covariates.
+
+
+### Stepwise Regression
+```{R}
+null_model<-lm(medv~1,df)
+full_model<-lm(medv~.,df)
+```
+
+Forward selection for stepwise regression:
+```{R}
+forward_model<-step(null_model,direction="forward",scope=formula(full_model))
+summary(forward_model)
+```
+Since including either age or indus would increase the AIC value at the final step, the forward stepwise regression ends and outputs the model that does not include age and indus, since it is the lowest AIC model that this method could find.
+
+Now do the opposite, start with the full model and procedurally remove variables:
+```{R}
+backward_model<-step(full_model,direction="backward",scope=formula(full_model))
+summary(backward_model)
+```
+Again, for the final step, removing any more variables would hurt the AIC, so it stops with the exact same model as the forward method produces. While they did the same thing here, they do not always produce the same model. In general, look at both methods and compare the differences.
+
+```{R}
+backward_model<-step(full_model,direction="both",scope=formula(full_model))
+summary(backward_model)
+```
+The "both" method considers both adding and dropping variables for a blend between the methods. Once again, it produces a model without age and indus. Next class we will look at the *LASSO* method for model selection, which is a faster method.
+
+
 
 
 
@@ -53,24 +130,7 @@ map(1:9, function(i)rnorm(1000) %>% hist(., main=i, col=i))
 
 Include a _very brief_ summary of what you learnt in this class here. 
 
-Today, I learnt the following concepts in class:
-
-1. Item 1
-1. Item 2
-1. Item 3
+**There was no class on Thursday.**
 :::
-
-Provide more concrete details here, e.g., 
-
-In class we learnt how to use the `map` function to create multiple regression diagnostic plots
-
-```{R results='hide', fig.height=4}
-par(mfcol=c(2, 3), mar=c(3.5, 3.5, 2, 1), mgp=c(2.4, 0.8, 0))
-mtcars %>%
-  split(.$cyl) %>%
-  map(~ lm(mpg ~ wt, data = .x)) %>%
-  map(function(x)plot(x, which=c(1, 2)))
-```
-
 
 [^footnote]: You can include some footnotes here

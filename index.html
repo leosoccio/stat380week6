@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Author Name">
+<meta name="author" content="Leo Soccio">
 
 <title>Weekly Summary Template</title>
 <style>
@@ -116,7 +116,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       <div>
       <div class="quarto-title-meta-heading">Author</div>
       <div class="quarto-title-meta-contents">
-               <p>Author Name </p>
+               <p>Leo Soccio </p>
             </div>
     </div>
       
@@ -131,7 +131,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#tuesday-jan-17" id="toc-tuesday-jan-17" class="nav-link active" data-scroll-target="#tuesday-jan-17">Tuesday, Jan 17</a></li>
+  <li><a href="#tuesday-jan-17" id="toc-tuesday-jan-17" class="nav-link active" data-scroll-target="#tuesday-jan-17">Tuesday, Jan 17</a>
+  <ul class="collapse">
+  <li><a href="#multicollinearity" id="toc-multicollinearity" class="nav-link" data-scroll-target="#multicollinearity">Multicollinearity</a></li>
+  <li><a href="#variance-inflation-factors-vif" id="toc-variance-inflation-factors-vif" class="nav-link" data-scroll-target="#variance-inflation-factors-vif">Variance Inflation Factors (VIF)</a></li>
+  <li><a href="#stepwise-regression" id="toc-stepwise-regression" class="nav-link" data-scroll-target="#stepwise-regression">Stepwise Regression</a></li>
+  </ul></li>
   <li><a href="#thursday-jan-19" id="toc-thursday-jan-19" class="nav-link" data-scroll-target="#thursday-jan-19">Thursday, Jan 19</a></li>
   </ul>
 </nav>
@@ -157,25 +162,660 @@ TIL
 <p>Include a <em>very brief</em> summary of what you learnt in this class here.</p>
 <p>Today, I learnt the following concepts in class:</p>
 <ol type="1">
-<li>Item 1</li>
-<li>Item 2</li>
-<li>Item 3</li>
+<li>Multicollinearity</li>
+<li>VIF</li>
+<li>Stepwise Regression</li>
 </ol>
 </div>
 </div>
 <p>Provide more concrete details here. You can also use footenotes<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> if you like</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(purrr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># package loading</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>packages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"ISLR2"</span>,<span class="st">"dplyr"</span>,<span class="st">"tidyr"</span>,<span class="st">"readr"</span>,<span class="st">"purrr"</span>,<span class="st">"glmnet"</span>,<span class="st">"caret"</span>,<span class="st">"car"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>renv<span class="sc">::</span><span class="fu">install</span>(packages)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Installing ISLR2 [1.3-2] ...
+    OK [linked cache in 7.1 milliseconds]
+Installing dplyr [1.1.0] ...
+    OK [linked cache in 4.7 milliseconds]
+Installing purrr [1.0.1] ...
+    OK [linked cache in 1.6 milliseconds]
+Installing tidyr [1.3.0] ...
+    OK [linked cache in 2.3 milliseconds]
+Installing readr [2.1.4] ...
+    OK [linked cache in 2.3 milliseconds]
+Installing glmnet [4.1-6] ...
+    OK [linked cache in 1.8 milliseconds]
+Installing caret [6.0-93] ...
+    OK [linked cache in 4.2 milliseconds]
+Installing car [3.1-1] ...
+    OK [linked cache in 3.7 milliseconds]</code></pre>
 </div>
-<p>For example: in class we learnt we learnt about the <code>map</code> function from the <code>purrr</code> package.</p>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"ISLR2"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Installing ISLR2 [1.3-2] ...
+    OK [linked cache in 3.7 milliseconds]</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'dplyr'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:stats':
+
+    filter, lag</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glmnet)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: Matrix</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'Matrix'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:tidyr':
+
+    expand, pack, unpack</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loaded glmnet 4.1-6</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: ggplot2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: lattice</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'caret'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:purrr':
+
+    lift</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(car)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: carData</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'car'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:purrr':
+
+    some</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:dplyr':
+
+    recode</code></pre>
+</div>
+</div>
+<section id="multicollinearity" class="level3">
+<h3 class="anchored" data-anchor-id="multicollinearity">Multicollinearity</h3>
+<p>Consider the Boston housing dataset:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">3</span>), <span class="at">mar=</span><span class="fu">c</span>(<span class="fl">3.5</span>, <span class="fl">3.5</span>, <span class="dv">2</span>, <span class="dv">1</span>), <span class="at">mgp=</span><span class="fu">c</span>(<span class="fl">2.4</span>, <span class="fl">0.8</span>, <span class="dv">0</span>))</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>, <span class="cf">function</span>(i)<span class="fu">rnorm</span>(<span class="dv">1000</span>) <span class="sc">%&gt;%</span> <span class="fu">hist</span>(., <span class="at">main=</span>i, <span class="at">col=</span>i))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ISLR2)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">attach</span>(ISLR2<span class="sc">::</span>Boston)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> Boston</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>full_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(medv<span class="sc">~</span>.,df)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(full_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = medv ~ ., data = df)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-15.1304  -2.7673  -0.5814   1.9414  26.2526 
+
+Coefficients:
+              Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  41.617270   4.936039   8.431 3.79e-16 ***
+crim         -0.121389   0.033000  -3.678 0.000261 ***
+zn            0.046963   0.013879   3.384 0.000772 ***
+indus         0.013468   0.062145   0.217 0.828520    
+chas          2.839993   0.870007   3.264 0.001173 ** 
+nox         -18.758022   3.851355  -4.870 1.50e-06 ***
+rm            3.658119   0.420246   8.705  &lt; 2e-16 ***
+age           0.003611   0.013329   0.271 0.786595    
+dis          -1.490754   0.201623  -7.394 6.17e-13 ***
+rad           0.289405   0.066908   4.325 1.84e-05 ***
+tax          -0.012682   0.003801  -3.337 0.000912 ***
+ptratio      -0.937533   0.132206  -7.091 4.63e-12 ***
+lstat        -0.552019   0.050659 -10.897  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 4.798 on 493 degrees of freedom
+Multiple R-squared:  0.7343,    Adjusted R-squared:  0.7278 
+F-statistic: 113.5 on 12 and 493 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>Observe insignificant variables:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(medv<span class="sc">~</span>age,df)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="fu">lm</span>(medv<span class="sc">~</span>age,df))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(medv<span class="sc">~</span>indus,df)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="fu">lm</span>(medv<span class="sc">~</span>indus,df))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>age_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(medv<span class="sc">~</span>age,df)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(age_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = medv ~ age, data = df)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-15.097  -5.138  -1.958   2.397  31.338 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) 30.97868    0.99911  31.006   &lt;2e-16 ***
+age         -0.12316    0.01348  -9.137   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 8.527 on 504 degrees of freedom
+Multiple R-squared:  0.1421,    Adjusted R-squared:  0.1404 
+F-statistic: 83.48 on 1 and 504 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>indus_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(medv<span class="sc">~</span>indus,df)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(indus_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = medv ~ indus, data = df)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-13.017  -4.917  -1.457   3.180  32.943 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) 29.75490    0.68345   43.54   &lt;2e-16 ***
+indus       -0.64849    0.05226  -12.41   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 8.057 on 504 degrees of freedom
+Multiple R-squared:  0.234, Adjusted R-squared:  0.2325 
+F-statistic:   154 on 1 and 504 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>Both age and indus are significant in their individual models, so why are they not significant in the full model?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(corrplot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>corrplot 0.92 loaded</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>R <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">keep</span>(is.numeric)<span class="sc">%&gt;%</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cor</span>()</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>R</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>               crim          zn       indus         chas         nox
+crim     1.00000000 -0.20046922  0.40658341 -0.055891582  0.42097171
+zn      -0.20046922  1.00000000 -0.53382819 -0.042696719 -0.51660371
+indus    0.40658341 -0.53382819  1.00000000  0.062938027  0.76365145
+chas    -0.05589158 -0.04269672  0.06293803  1.000000000  0.09120281
+nox      0.42097171 -0.51660371  0.76365145  0.091202807  1.00000000
+rm      -0.21924670  0.31199059 -0.39167585  0.091251225 -0.30218819
+age      0.35273425 -0.56953734  0.64477851  0.086517774  0.73147010
+dis     -0.37967009  0.66440822 -0.70802699 -0.099175780 -0.76923011
+rad      0.62550515 -0.31194783  0.59512927 -0.007368241  0.61144056
+tax      0.58276431 -0.31456332  0.72076018 -0.035586518  0.66802320
+ptratio  0.28994558 -0.39167855  0.38324756 -0.121515174  0.18893268
+lstat    0.45562148 -0.41299457  0.60379972 -0.053929298  0.59087892
+medv    -0.38830461  0.36044534 -0.48372516  0.175260177 -0.42732077
+                 rm         age         dis          rad         tax    ptratio
+crim    -0.21924670  0.35273425 -0.37967009  0.625505145  0.58276431  0.2899456
+zn       0.31199059 -0.56953734  0.66440822 -0.311947826 -0.31456332 -0.3916785
+indus   -0.39167585  0.64477851 -0.70802699  0.595129275  0.72076018  0.3832476
+chas     0.09125123  0.08651777 -0.09917578 -0.007368241 -0.03558652 -0.1215152
+nox     -0.30218819  0.73147010 -0.76923011  0.611440563  0.66802320  0.1889327
+rm       1.00000000 -0.24026493  0.20524621 -0.209846668 -0.29204783 -0.3555015
+age     -0.24026493  1.00000000 -0.74788054  0.456022452  0.50645559  0.2615150
+dis      0.20524621 -0.74788054  1.00000000 -0.494587930 -0.53443158 -0.2324705
+rad     -0.20984667  0.45602245 -0.49458793  1.000000000  0.91022819  0.4647412
+tax     -0.29204783  0.50645559 -0.53443158  0.910228189  1.00000000  0.4608530
+ptratio -0.35550149  0.26151501 -0.23247054  0.464741179  0.46085304  1.0000000
+lstat   -0.61380827  0.60233853 -0.49699583  0.488676335  0.54399341  0.3740443
+medv     0.69535995 -0.37695457  0.24992873 -0.381626231 -0.46853593 -0.5077867
+             lstat       medv
+crim     0.4556215 -0.3883046
+zn      -0.4129946  0.3604453
+indus    0.6037997 -0.4837252
+chas    -0.0539293  0.1752602
+nox      0.5908789 -0.4273208
+rm      -0.6138083  0.6953599
+age      0.6023385 -0.3769546
+dis     -0.4969958  0.2499287
+rad      0.4886763 -0.3816262
+tax      0.5439934 -0.4685359
+ptratio  0.3740443 -0.5077867
+lstat    1.0000000 -0.7376627
+medv    -0.7376627  1.0000000</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">corrplot</span>(R, <span class="at">type=</span><span class="st">"upper"</span>,<span class="at">order=</span><span class="st">"hclust"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Age and indus are clearly related to multiple other variables.</p>
+</section>
+<section id="variance-inflation-factors-vif" class="level3">
+<h3 class="anchored" data-anchor-id="variance-inflation-factors-vif">Variance Inflation Factors (VIF)</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(car)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>vif_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(medv<span class="sc">~</span>.,df)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="fu">vif</span>(vif_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    crim       zn    indus     chas      nox       rm      age      dis 
+1.767486 2.298459 3.987181 1.071168 4.369093 1.912532 3.088232 3.954037 
+     rad      tax  ptratio    lstat 
+7.445301 9.002158 1.797060 2.870777 </code></pre>
+</div>
+</div>
+<p>VIF&gt;2 means that there is high variance inflation and correlation with other covariates.</p>
+</section>
+<section id="stepwise-regression" class="level3">
+<h3 class="anchored" data-anchor-id="stepwise-regression">Stepwise Regression</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>null_model<span class="ot">&lt;-</span><span class="fu">lm</span>(medv<span class="sc">~</span><span class="dv">1</span>,df)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>full_model<span class="ot">&lt;-</span><span class="fu">lm</span>(medv<span class="sc">~</span>.,df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Forward selection for stepwise regression:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>forward_model<span class="ot">&lt;-</span><span class="fu">step</span>(null_model,<span class="at">direction=</span><span class="st">"forward"</span>,<span class="at">scope=</span><span class="fu">formula</span>(full_model))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Start:  AIC=2246.51
+medv ~ 1
+
+          Df Sum of Sq   RSS    AIC
++ lstat    1   23243.9 19472 1851.0
++ rm       1   20654.4 22062 1914.2
++ ptratio  1   11014.3 31702 2097.6
++ indus    1    9995.2 32721 2113.6
++ tax      1    9377.3 33339 2123.1
++ nox      1    7800.1 34916 2146.5
++ crim     1    6440.8 36276 2165.8
++ rad      1    6221.1 36495 2168.9
++ age      1    6069.8 36647 2171.0
++ zn       1    5549.7 37167 2178.1
++ dis      1    2668.2 40048 2215.9
++ chas     1    1312.1 41404 2232.7
+&lt;none&gt;                 42716 2246.5
+
+Step:  AIC=1851.01
+medv ~ lstat
+
+          Df Sum of Sq   RSS    AIC
++ rm       1    4033.1 15439 1735.6
++ ptratio  1    2670.1 16802 1778.4
++ chas     1     786.3 18686 1832.2
++ dis      1     772.4 18700 1832.5
++ age      1     304.3 19168 1845.0
++ tax      1     274.4 19198 1845.8
++ zn       1     160.3 19312 1848.8
++ crim     1     146.9 19325 1849.2
++ indus    1      98.7 19374 1850.4
+&lt;none&gt;                 19472 1851.0
++ rad      1      25.1 19447 1852.4
++ nox      1       4.8 19468 1852.9
+
+Step:  AIC=1735.58
+medv ~ lstat + rm
+
+          Df Sum of Sq   RSS    AIC
++ ptratio  1   1711.32 13728 1678.1
++ chas     1    548.53 14891 1719.3
++ tax      1    425.16 15014 1723.5
++ dis      1    351.15 15088 1725.9
++ crim     1    311.42 15128 1727.3
++ rad      1    180.45 15259 1731.6
++ indus    1     61.09 15378 1735.6
+&lt;none&gt;                 15439 1735.6
++ zn       1     56.56 15383 1735.7
++ age      1     20.18 15419 1736.9
++ nox      1     14.90 15424 1737.1
+
+Step:  AIC=1678.13
+medv ~ lstat + rm + ptratio
+
+        Df Sum of Sq   RSS    AIC
++ dis    1    499.08 13229 1661.4
++ chas   1    377.96 13350 1666.0
++ crim   1    122.52 13606 1675.6
++ age    1     66.24 13662 1677.7
+&lt;none&gt;               13728 1678.1
++ tax    1     44.36 13684 1678.5
++ nox    1     24.81 13703 1679.2
++ zn     1     14.96 13713 1679.6
++ rad    1      6.07 13722 1679.9
++ indus  1      0.83 13727 1680.1
+
+Step:  AIC=1661.39
+medv ~ lstat + rm + ptratio + dis
+
+        Df Sum of Sq   RSS    AIC
++ nox    1    759.56 12469 1633.5
++ chas   1    267.43 12962 1653.1
++ indus  1    242.65 12986 1654.0
++ tax    1    240.34 12989 1654.1
++ crim   1    233.54 12995 1654.4
++ zn     1    144.81 13084 1657.8
++ age    1     61.36 13168 1661.0
+&lt;none&gt;               13229 1661.4
++ rad    1     22.40 13206 1662.5
+
+Step:  AIC=1633.47
+medv ~ lstat + rm + ptratio + dis + nox
+
+        Df Sum of Sq   RSS    AIC
++ chas   1    328.27 12141 1622.0
++ zn     1    151.71 12318 1629.3
++ crim   1    141.43 12328 1629.7
++ rad    1     53.48 12416 1633.3
+&lt;none&gt;               12469 1633.5
++ indus  1     17.10 12452 1634.8
++ tax    1     10.50 12459 1635.0
++ age    1      0.25 12469 1635.5
+
+Step:  AIC=1621.97
+medv ~ lstat + rm + ptratio + dis + nox + chas
+
+        Df Sum of Sq   RSS    AIC
++ zn     1   164.406 11977 1617.1
++ crim   1   116.330 12025 1619.1
++ rad    1    58.556 12082 1621.5
+&lt;none&gt;               12141 1622.0
++ indus  1    26.274 12115 1622.9
++ tax    1     4.187 12137 1623.8
++ age    1     2.331 12139 1623.9
+
+Step:  AIC=1617.07
+medv ~ lstat + rm + ptratio + dis + nox + chas + zn
+
+        Df Sum of Sq   RSS    AIC
++ crim   1   170.902 11806 1611.8
+&lt;none&gt;               11977 1617.1
++ tax    1    31.773 11945 1617.7
++ rad    1    28.311 11948 1617.9
++ indus  1    27.377 11949 1617.9
++ age    1     0.071 11977 1619.1
+
+Step:  AIC=1611.8
+medv ~ lstat + rm + ptratio + dis + nox + chas + zn + crim
+
+        Df Sum of Sq   RSS    AIC
++ rad    1   155.006 11651 1607.1
+&lt;none&gt;               11806 1611.8
++ indus  1    24.957 11781 1612.7
++ tax    1     1.418 11804 1613.7
++ age    1     0.178 11806 1613.8
+
+Step:  AIC=1607.11
+medv ~ lstat + rm + ptratio + dis + nox + chas + zn + crim + 
+    rad
+
+        Df Sum of Sq   RSS    AIC
++ tax    1   298.573 11352 1596.0
+&lt;none&gt;               11651 1607.1
++ indus  1    44.346 11606 1607.2
++ age    1     0.581 11650 1609.1
+
+Step:  AIC=1595.98
+medv ~ lstat + rm + ptratio + dis + nox + chas + zn + crim + 
+    rad + tax
+
+        Df Sum of Sq   RSS    AIC
+&lt;none&gt;               11352 1596.0
++ age    1    1.6865 11350 1597.9
++ indus  1    1.0784 11351 1597.9</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(forward_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = medv ~ lstat + rm + ptratio + dis + nox + chas + 
+    zn + crim + rad + tax, data = df)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-15.1814  -2.7625  -0.6243   1.8448  26.3920 
+
+Coefficients:
+              Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  41.451747   4.903283   8.454 3.18e-16 ***
+lstat        -0.546509   0.047442 -11.519  &lt; 2e-16 ***
+rm            3.672957   0.409127   8.978  &lt; 2e-16 ***
+ptratio      -0.930961   0.130423  -7.138 3.39e-12 ***
+dis          -1.515951   0.187675  -8.078 5.08e-15 ***
+nox         -18.262427   3.565247  -5.122 4.33e-07 ***
+chas          2.871873   0.862591   3.329 0.000935 ***
+zn            0.046191   0.013673   3.378 0.000787 ***
+crim         -0.121665   0.032919  -3.696 0.000244 ***
+rad           0.283932   0.063945   4.440 1.11e-05 ***
+tax          -0.012292   0.003407  -3.608 0.000340 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 4.789 on 495 degrees of freedom
+Multiple R-squared:  0.7342,    Adjusted R-squared:  0.7289 
+F-statistic: 136.8 on 10 and 495 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>Since including either age or indus would increase the AIC value at the final step, the forward stepwise regression ends and outputs the model that does not include age and indus, since it is the lowest AIC model that this method could find.</p>
+<p>Now do the opposite, start with the full model and procedurally remove variables:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>backward_model<span class="ot">&lt;-</span><span class="fu">step</span>(full_model,<span class="at">direction=</span><span class="st">"backward"</span>,<span class="at">scope=</span><span class="fu">formula</span>(full_model))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Start:  AIC=1599.85
+medv ~ crim + zn + indus + chas + nox + rm + age + dis + rad + 
+    tax + ptratio + lstat
+
+          Df Sum of Sq   RSS    AIC
+- indus    1      1.08 11350 1597.9
+- age      1      1.69 11351 1597.9
+&lt;none&gt;                 11349 1599.8
+- chas     1    245.31 11595 1608.7
+- tax      1    256.28 11606 1609.2
+- zn       1    263.59 11613 1609.5
+- crim     1    311.49 11661 1611.6
+- rad      1    430.71 11780 1616.7
+- nox      1    546.10 11896 1621.6
+- ptratio  1   1157.70 12507 1647.0
+- dis      1   1258.52 12608 1651.1
+- rm       1   1744.36 13094 1670.2
+- lstat    1   2733.54 14083 1707.0
+
+Step:  AIC=1597.9
+medv ~ crim + zn + chas + nox + rm + age + dis + rad + tax + 
+    ptratio + lstat
+
+          Df Sum of Sq   RSS    AIC
+- age      1      1.69 11352 1596.0
+&lt;none&gt;                 11350 1597.9
+- chas     1    251.21 11602 1607.0
+- zn       1    262.99 11614 1607.5
+- tax      1    299.68 11650 1609.1
+- crim     1    313.07 11664 1609.7
+- rad      1    453.61 11804 1615.7
+- nox      1    574.23 11925 1620.9
+- ptratio  1   1168.01 12518 1645.5
+- dis      1   1333.19 12684 1652.1
+- rm       1   1750.50 13101 1668.5
+- lstat    1   2743.21 14094 1705.4
+
+Step:  AIC=1595.98
+medv ~ crim + zn + chas + nox + rm + dis + rad + tax + ptratio + 
+    lstat
+
+          Df Sum of Sq   RSS    AIC
+&lt;none&gt;                 11352 1596.0
+- chas     1    254.21 11606 1605.2
+- zn       1    261.75 11614 1605.5
+- tax      1    298.57 11651 1607.1
+- crim     1    313.27 11666 1607.8
+- rad      1    452.16 11804 1613.7
+- nox      1    601.74 11954 1620.1
+- ptratio  1   1168.51 12521 1643.5
+- dis      1   1496.35 12848 1656.6
+- rm       1   1848.38 13201 1670.3
+- lstat    1   3043.23 14395 1714.2</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(backward_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = medv ~ crim + zn + chas + nox + rm + dis + rad + 
+    tax + ptratio + lstat, data = df)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-15.1814  -2.7625  -0.6243   1.8448  26.3920 
+
+Coefficients:
+              Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  41.451747   4.903283   8.454 3.18e-16 ***
+crim         -0.121665   0.032919  -3.696 0.000244 ***
+zn            0.046191   0.013673   3.378 0.000787 ***
+chas          2.871873   0.862591   3.329 0.000935 ***
+nox         -18.262427   3.565247  -5.122 4.33e-07 ***
+rm            3.672957   0.409127   8.978  &lt; 2e-16 ***
+dis          -1.515951   0.187675  -8.078 5.08e-15 ***
+rad           0.283932   0.063945   4.440 1.11e-05 ***
+tax          -0.012292   0.003407  -3.608 0.000340 ***
+ptratio      -0.930961   0.130423  -7.138 3.39e-12 ***
+lstat        -0.546509   0.047442 -11.519  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 4.789 on 495 degrees of freedom
+Multiple R-squared:  0.7342,    Adjusted R-squared:  0.7289 
+F-statistic: 136.8 on 10 and 495 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>Again, for the final step, removing any more variables would hurt the AIC, so it stops with the exact same model as the forward method produces. While they did the same thing here, they do not always produce the same model. In general, look at both methods and compare the differences.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>backward_model<span class="ot">&lt;-</span><span class="fu">step</span>(full_model,<span class="at">direction=</span><span class="st">"both"</span>,<span class="at">scope=</span><span class="fu">formula</span>(full_model))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Start:  AIC=1599.85
+medv ~ crim + zn + indus + chas + nox + rm + age + dis + rad + 
+    tax + ptratio + lstat
+
+          Df Sum of Sq   RSS    AIC
+- indus    1      1.08 11350 1597.9
+- age      1      1.69 11351 1597.9
+&lt;none&gt;                 11349 1599.8
+- chas     1    245.31 11595 1608.7
+- tax      1    256.28 11606 1609.2
+- zn       1    263.59 11613 1609.5
+- crim     1    311.49 11661 1611.6
+- rad      1    430.71 11780 1616.7
+- nox      1    546.10 11896 1621.6
+- ptratio  1   1157.70 12507 1647.0
+- dis      1   1258.52 12608 1651.1
+- rm       1   1744.36 13094 1670.2
+- lstat    1   2733.54 14083 1707.0
+
+Step:  AIC=1597.9
+medv ~ crim + zn + chas + nox + rm + age + dis + rad + tax + 
+    ptratio + lstat
+
+          Df Sum of Sq   RSS    AIC
+- age      1      1.69 11352 1596.0
+&lt;none&gt;                 11350 1597.9
++ indus    1      1.08 11349 1599.8
+- chas     1    251.21 11602 1607.0
+- zn       1    262.99 11614 1607.5
+- tax      1    299.68 11650 1609.1
+- crim     1    313.07 11664 1609.7
+- rad      1    453.61 11804 1615.7
+- nox      1    574.23 11925 1620.9
+- ptratio  1   1168.01 12518 1645.5
+- dis      1   1333.19 12684 1652.1
+- rm       1   1750.50 13101 1668.5
+- lstat    1   2743.21 14094 1705.4
+
+Step:  AIC=1595.98
+medv ~ crim + zn + chas + nox + rm + dis + rad + tax + ptratio + 
+    lstat
+
+          Df Sum of Sq   RSS    AIC
+&lt;none&gt;                 11352 1596.0
++ age      1      1.69 11350 1597.9
++ indus    1      1.08 11351 1597.9
+- chas     1    254.21 11606 1605.2
+- zn       1    261.75 11614 1605.5
+- tax      1    298.57 11651 1607.1
+- crim     1    313.27 11666 1607.8
+- rad      1    452.16 11804 1613.7
+- nox      1    601.74 11954 1620.1
+- ptratio  1   1168.51 12521 1643.5
+- dis      1   1496.35 12848 1656.6
+- rm       1   1848.38 13201 1670.3
+- lstat    1   3043.23 14395 1714.2</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(backward_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = medv ~ crim + zn + chas + nox + rm + dis + rad + 
+    tax + ptratio + lstat, data = df)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-15.1814  -2.7625  -0.6243   1.8448  26.3920 
+
+Coefficients:
+              Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  41.451747   4.903283   8.454 3.18e-16 ***
+crim         -0.121665   0.032919  -3.696 0.000244 ***
+zn            0.046191   0.013673   3.378 0.000787 ***
+chas          2.871873   0.862591   3.329 0.000935 ***
+nox         -18.262427   3.565247  -5.122 4.33e-07 ***
+rm            3.672957   0.409127   8.978  &lt; 2e-16 ***
+dis          -1.515951   0.187675  -8.078 5.08e-15 ***
+rad           0.283932   0.063945   4.440 1.11e-05 ***
+tax          -0.012292   0.003407  -3.608 0.000340 ***
+ptratio      -0.930961   0.130423  -7.138 3.39e-12 ***
+lstat        -0.546509   0.047442 -11.519  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 4.789 on 495 degrees of freedom
+Multiple R-squared:  0.7342,    Adjusted R-squared:  0.7289 
+F-statistic: 136.8 on 10 and 495 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>The “both” method considers both adding and dropping variables for a blend between the methods. Once again, it produces a model without age and indus. Next class we will look at the <em>LASSO</em> method for model selection, which is a faster method.</p>
+</section>
 </section>
 <section id="thursday-jan-19" class="level2">
 <h2 class="anchored" data-anchor-id="thursday-jan-19">Thursday, Jan 19</h2>
@@ -190,24 +830,7 @@ TIL
 </div>
 <div class="callout-body-container callout-body">
 <p>Include a <em>very brief</em> summary of what you learnt in this class here.</p>
-<p>Today, I learnt the following concepts in class:</p>
-<ol type="1">
-<li>Item 1</li>
-<li>Item 2</li>
-<li>Item 3</li>
-</ol>
-</div>
-</div>
-<p>Provide more concrete details here, e.g.,</p>
-<p>In class we learnt how to use the <code>map</code> function to create multiple regression diagnostic plots</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfcol=</span><span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>), <span class="at">mar=</span><span class="fu">c</span>(<span class="fl">3.5</span>, <span class="fl">3.5</span>, <span class="dv">2</span>, <span class="dv">1</span>), <span class="at">mgp=</span><span class="fu">c</span>(<span class="fl">2.4</span>, <span class="fl">0.8</span>, <span class="dv">0</span>))</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>mtcars <span class="sc">%&gt;%</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">split</span>(.<span class="sc">$</span>cyl) <span class="sc">%&gt;%</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map</span>(<span class="sc">~</span> <span class="fu">lm</span>(mpg <span class="sc">~</span> wt, <span class="at">data =</span> .x)) <span class="sc">%&gt;%</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map</span>(<span class="cf">function</span>(x)<span class="fu">plot</span>(x, <span class="at">which=</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+<p><strong>There was no class on Thursday.</strong></p>
 </div>
 </div>
 </section>
